@@ -15,8 +15,8 @@ var config = {
     authentication:{
         type:'default',
         options:{
-            userName:'sa',
-            password:'Sqlpassword1@'
+            userName:process.env.DB_USER,
+            password:process.env.DB_PASSWORD
         }
     },
 }
