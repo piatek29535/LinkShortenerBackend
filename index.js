@@ -4,10 +4,24 @@ require('dotenv').config()
 
 // Other imports
 const express = require('express');
+let request = require('request');
 const app = express();
 const port  = 3000;
+app.use(express.json())
 var Connection = require('tedious').Connection;
 var Request = require('tedious').Request;
+
+// REbrandly config
+
+let linkRequest = {
+    destination:'https://tarnowiak.pl/',
+    domain:{fullName:'rebrand.ly'}
+}
+
+let requestHeaders = {
+    "Content-type":"application/json",
+    "apikey":process.env.APIKEY
+}
 
 // Database config
 var config = {
@@ -35,16 +49,30 @@ connection.on('connect', function(err){
 
 connection.connect();
 
-app.get('/',(req, res) => {
-    res.json({"message":"ok"})
+app.post('/shorten',(req, res) => {
+    // res.json({"message":"ok"})
+    // executeStatement()
 
-    executeStatement()
+    request({
+        uri:'https://api.rebrandly.com/v1/links',
+        method:"POST",
+        body:JSON.stringify(linkRequest),
+        headers:requestHeaders
+    }, (err, response, body) => {
+        let link = JSON.parse(body)
+        res.json({
+            "message":link
+        })
+    })
+
 })
 
 app.listen(port, () => {
     console.log(`Server is running at port ${port}`)
 })
 
+
+// Database functions
 function executeStatement() {
     request = new Request("select 123, 'hellow'", function(err, rowCount){
         if(err){
